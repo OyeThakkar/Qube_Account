@@ -58,7 +58,7 @@ export default function AppSidebar() {
             <rect x="13" y="13" width="4" height="4" rx="1"></rect>
           </svg>
           <h1 className="text-xl font-semibold text-primary group-data-[collapsible=icon]:hidden">
-            Qube Central
+            Qube Account
           </h1>
         </Link>
       </SidebarHeader>

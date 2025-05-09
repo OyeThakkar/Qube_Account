@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Qube Central',
+  title: 'Qube Account',
   description: 'Qube Account IAM Tool',
 };
 

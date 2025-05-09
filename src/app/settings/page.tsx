@@ -17,7 +17,7 @@ export default function SettingsPage() {
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground mb-4">
-              Manage how users authenticate with Qube Central and connected services.
+              Manage how users authenticate with Qube Account and connected services.
             </p>
             <Button variant="outline" disabled>Manage Authentication</Button>
           </CardContent>
