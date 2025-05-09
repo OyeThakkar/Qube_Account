@@ -1,3 +1,4 @@
+// company-form.tsx
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -21,6 +22,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { mockQubeServices } from "@/lib/mock-data";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
+import { useRouter } from 'next/navigation'; // Added useRouter
 
 const companyFormSchema = z.object({
   name: z.string().min(2, "Company name must be at least 2 characters."),
@@ -44,11 +46,12 @@ type CompanyFormValues = z.infer<typeof companyFormSchema>;
 
 interface CompanyFormProps {
   company?: Company; // For editing existing company
-  onSubmitSuccess?: () => void;
+  // onSubmitSuccess?: () => void; // Removed this prop as logic is now internal
 }
 
-export default function CompanyForm({ company, onSubmitSuccess }: CompanyFormProps) {
+export default function CompanyForm({ company }: CompanyFormProps) {
   const { toast } = useToast();
+  const router = useRouter(); // Added router instance
   const form = useForm<CompanyFormValues>({
     resolver: zodResolver(companyFormSchema),
     defaultValues: {
@@ -78,7 +81,14 @@ export default function CompanyForm({ company, onSubmitSuccess }: CompanyFormPro
       description: `${data.name} details have been ${company ? 'updated' : 'saved'}.`,
       variant: "default", // 'default' uses primary color
     });
-    if (onSubmitSuccess) onSubmitSuccess();
+
+    // If this is a new company creation (company prop is undefined), redirect
+    if (!company) {
+      console.log("New company created, redirecting to /companies...");
+      router.push('/companies');
+    }
+    // If onSubmitSuccess was passed (it's not anymore, but keeping logic in case), call it
+    // if (onSubmitSuccess) onSubmitSuccess(); 
   }
 
   return (

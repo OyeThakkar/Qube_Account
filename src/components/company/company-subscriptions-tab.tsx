@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { MoreVertical, Edit3, UserX, PlusCircle, ServerCog } from "lucide-react";
+import { MoreVertical, Edit3, UserX, PlusCircle, ServerCog, UserPlus } from "lucide-react"; // Added UserPlus
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 export default function CompanySubscriptionsTab({ companyId }: { companyId: string }) {

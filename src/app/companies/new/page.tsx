@@ -1,29 +1,21 @@
-"use client";
+// "use client"; // No longer needed here as interactivity is in CompanyForm
 
 import PageHeader from '@/components/shared/page-header';
 import CompanyForm from '@/components/company/company-form';
-// import { Card, CardContent } from '@/components/ui/card'; // Card and CardContent are not used here.
-import { useRouter } from 'next/navigation'; // Import for client-side navigation
+// import { useRouter } from 'next/navigation'; // No longer needed here
 
 export default function NewCompanyPage() {
-  const router = useRouter();
+  // const router = useRouter(); // Moved to CompanyForm
 
-  // In a real app, redirect or show success message
-  const handleSuccess = () => {
-    console.log("Company created successfully, redirecting...");
-    // For actual redirection, use router.push.
-    // This example assumes CompanyForm shows a toast, and redirection happens from here.
-    router.push('/companies'); 
-  };
+  // const handleSuccess = () => { // Moved to CompanyForm
+  //   console.log("Company created successfully, redirecting...");
+  //   router.push('/companies'); 
+  // };
 
   return (
     <>
       <PageHeader title="Add New Company" description="Fill in the details to create a new company account." />
-      {/* 
-        The CompanyForm is wrapped in a Card inside its own component, 
-        so no need to wrap it in a Card here again.
-      */}
-      <CompanyForm onSubmitSuccess={handleSuccess} />
+      <CompanyForm /> {/* Removed onSubmitSuccess prop */}
     </>
   );
 }
