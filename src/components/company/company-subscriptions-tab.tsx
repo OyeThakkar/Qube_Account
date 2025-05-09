@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -21,17 +22,14 @@ export default function CompanySubscriptionsTab({ companyId }: { companyId: stri
     ? mockCompanyUsers.filter(u => Math.random() > 0.3).map(u => ({...u, serviceRole: ['Admin', 'Editor', 'Viewer'][Math.floor(Math.random()*3)]})) 
     : [];
 
-  // const handleAddServiceSubscription = () => { console.log("Add service subscription for company", companyId); };
   // const handleManageUserAccess = (userId: string, serviceId: string) => { console.log("Manage user", userId, "access for service", serviceId); };
 
   return (
     <div className="grid md:grid-cols-3 gap-6">
       <Card className="md:col-span-1">
-        <CardHeader className="flex flex-row items-center justify-between">
+        <CardHeader>
           <CardTitle className="text-lg">Subscribed Services</CardTitle>
-          <Button variant="outline" size="sm" >{/*onClick={handleAddServiceSubscription}*/}
-            <PlusCircle className="mr-2 h-4 w-4" /> Add Service
-          </Button>
+          {/* Removed "Add Service" button as subscriptions are managed in CompanyForm */}
         </CardHeader>
         <CardContent>
           <ScrollArea className="h-[400px]">
@@ -69,7 +67,7 @@ export default function CompanySubscriptionsTab({ companyId }: { companyId: stri
             <>
               <div className="mb-4 text-right">
                 <Button size="sm" >{/*onClick={() => console.log("Add user to service", selectedService.id)}*/}
-                  <UserX className="mr-2 h-4 w-4" /> Add User to Service
+                  <UserPlus className="mr-2 h-4 w-4" /> Add User to Service {/* Changed icon to UserPlus for clarity */}
                 </Button>
               </div>
               <div className="rounded-lg border overflow-hidden shadow-sm">

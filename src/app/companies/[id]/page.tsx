@@ -3,15 +3,16 @@ import PageHeader from '@/components/shared/page-header';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { mockCompanies, mockQubeServices } from '@/lib/mock-data';
+import { mockCompanies } from '@/lib/mock-data';
 import type { Company } from '@/types';
 import CompanyForm from '@/components/company/company-form';
 import CompanyUsersTab from '@/components/company/company-users-tab';
 import CompanySubscriptionsTab from '@/components/company/company-subscriptions-tab';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowLeft, Edit3, FileText, Users, ServerCog } from 'lucide-react';
+import { ArrowLeft, FileText, Users, ServerCog } from 'lucide-react';
 import { notFound } from 'next/navigation'; // Import notFound
+import { Badge } from '@/components/ui/badge'; // Added missing import
 
 interface CompanyProfilePageProps {
   params: { id: string };
