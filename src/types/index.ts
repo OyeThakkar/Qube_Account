@@ -27,7 +27,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  qubeAccountRole: string; 
+  associatedServices: string[]; // List of service names user is associated with
   status: 'Active' | 'Inactive';
 }
 
@@ -62,3 +62,4 @@ export interface RecentActivity {
   type: 'CompanyUpdate' | 'UserUpdate' | 'ServiceSubscription' | 'System';
   icon?: React.ElementType;
 }
+

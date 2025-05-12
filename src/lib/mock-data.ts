@@ -41,18 +41,18 @@ export const mockCompanies: Company[] = [
   },
 ];
 
-export const mockCompanyUsers: User[] = [
-  { id: 'u1', name: 'Alice Wonderland', email: 'alice@innovatech.com', qubeAccountRole: 'Admin', status: 'Active' },
-  { id: 'u2', name: 'Bob The Builder', email: 'bob@innovatech.com', qubeAccountRole: 'Editor', status: 'Active' },
-  { id: 'u3', name: 'Charlie Chaplin', email: 'charlie@synergy.com', qubeAccountRole: 'Manager', status: 'Inactive' },
-];
+const firstNames = ["Alice", "Bob", "Charlie", "David", "Eve", "Fiona", "George", "Hannah", "Ian", "Julia", "Kevin", "Laura", "Michael", "Nora", "Oscar", "Pamela", "Quentin", "Rachel", "Steven", "Tina", "Usman", "Violet", "Walter", "Xenia", "Yannick", "Zoe"];
+const lastNames = ["Smith", "Jones", "Williams", "Brown", "Davis", "Miller", "Wilson", "Moore", "Taylor", "Anderson", "Thomas", "Jackson", "White", "Harris", "Martin", "Thompson", "Garcia", "Martinez", "Robinson", "Clark"];
+const domains = ["example.com", "test.org", "sample.net", "demo.co"];
 
+// Define mockPortalUsers before mockQubeServices if it's used in its definition
 export const mockPortalUsers: PortalUser[] = [
   { id: 'pu1', name: 'Peter Pan', email: 'peter.pan@qubecinema.com', role: 'Admin', lastUpdatedOn: new Date().toISOString(), lastUpdatedBy: 'System' },
   { id: 'pu2', name: 'Wendy Darling', email: 'wendy.darling@qubecinema.com', role: 'Company Manager', lastUpdatedOn: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(), lastUpdatedBy: 'Peter Pan' },
   { id: 'pu3', name: 'John Doe', email: 'john.doe@qubecinema.com', role: 'Viewer', lastUpdatedOn: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(), lastUpdatedBy: 'Peter Pan' },
 ];
 
+// Now define mockQubeServices, it can safely access mockPortalUsers.length
 export let mockQubeServices: QubeService[] = [
   { id: 'qs1', name: 'Qube Wire Distributor', accessUrl: 'distributor.qubewire.com', subscribedCompaniesCount: 25, lastUpdated: new Date().toISOString() },
   { id: 'qs2', name: 'Qube Wire Exhibitor', accessUrl: 'exhibitor.qubewire.com', subscribedCompaniesCount: 150, lastUpdated: new Date().toISOString() },
@@ -63,11 +63,27 @@ export let mockQubeServices: QubeService[] = [
   { id: 'qs7', name: 'iCount', accessUrl: 'app.icount.com', subscribedCompaniesCount: 200, lastUpdated: new Date().toISOString() },
   { id: 'qs8', name: 'MovieBuff Access', accessUrl: 'access.moviebuff.com', subscribedCompaniesCount: 120, lastUpdated: new Date().toISOString() },
   { id: 'qs9', name: 'Qube Cinemas', accessUrl: 'notpublic.qubecinema.com', subscribedCompaniesCount: 30, lastUpdated: new Date().toISOString() },
-  { id: 'qs10', name: 'Qube Account', accessUrl: 'account.qubecinema.com', subscribedCompaniesCount: 5, lastUpdated: new Date().toISOString() },
+  { id: 'qs10', name: 'Qube Account', accessUrl: 'account.qubecinema.com', subscribedCompaniesCount: mockCompanies.length + mockPortalUsers.length, lastUpdated: new Date().toISOString() },
 ];
-
-// Sort services alphabetically by name
 mockQubeServices.sort((a, b) => a.name.localeCompare(b.name));
+
+
+export const mockCompanyUsers: User[] = Array.from({ length: 40 }, (_, i) => {
+  const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+  const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+  const emailName = `${firstName.toLowerCase()}.${lastName.toLowerCase()}${Math.random() > 0.5 ? i : ''}`;
+  const numServices = Math.floor(Math.random() * 3) + 1; // 1 to 3 services
+  // Ensure mockQubeServices is fully defined and sorted before using it here
+  const companyServices = [...mockQubeServices].sort(() => 0.5 - Math.random()).slice(0, numServices).map(s => s.name);
+  
+  return {
+    id: `cu${i + 1}`,
+    name: `${firstName} ${lastName}`,
+    email: `${emailName}@${domains[Math.floor(Math.random() * domains.length)]}`,
+    associatedServices: companyServices,
+    status: Math.random() > 0.2 ? 'Active' : 'Inactive', // 80% active
+  };
+});
 
 
 export const mockDashboardMetrics: DashboardMetrics = {
@@ -78,7 +94,7 @@ export const mockDashboardMetrics: DashboardMetrics = {
 
 export const mockRecentActivities: RecentActivity[] = [
   { id: 'ra1', description: 'New company "Innovatech Solutions" onboarded.', timestamp: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(), user: 'Peter Pan', type: 'CompanyUpdate', icon: Building2 },
-  { id: 'ra2', description: 'User Alice Wonderland added to Innovatech.', timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), user: 'Peter Pan', type: 'UserUpdate', icon: UserPlus },
+  { id: 'ra2', description: `User ${mockCompanyUsers[0].name} added to Innovatech.`, timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), user: 'Peter Pan', type: 'UserUpdate', icon: UserPlus },
   { id: 'ra3', description: 'Qube Wire Exhibitor service updated.', timestamp: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(), type: 'ServiceSubscription', icon: ServerCog },
   { id: 'ra4', description: 'System maintenance scheduled for tomorrow.', timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(), type: 'System', icon: ShieldCheck },
 ];
