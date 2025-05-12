@@ -53,7 +53,7 @@ export const mockPortalUsers: PortalUser[] = [
   { id: 'pu3', name: 'John Doe', email: 'john.doe@qubecinema.com', role: 'Viewer', lastUpdatedOn: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(), lastUpdatedBy: 'Peter Pan' },
 ];
 
-export const mockQubeServices: QubeService[] = [
+export let mockQubeServices: QubeService[] = [
   { id: 'qs1', name: 'Qube Wire Distributor', accessUrl: 'distributor.qubewire.com', subscribedCompaniesCount: 25, lastUpdated: new Date().toISOString() },
   { id: 'qs2', name: 'Qube Wire Exhibitor', accessUrl: 'exhibitor.qubewire.com', subscribedCompaniesCount: 150, lastUpdated: new Date().toISOString() },
   { id: 'qs3', name: 'Qube Wire Partner', accessUrl: 'partner.qubewire.com', subscribedCompaniesCount: 10, lastUpdated: new Date().toISOString() },
@@ -65,6 +65,10 @@ export const mockQubeServices: QubeService[] = [
   { id: 'qs9', name: 'Qube Cinemas', accessUrl: 'notpublic.qubecinema.com', subscribedCompaniesCount: 30, lastUpdated: new Date().toISOString() },
   { id: 'qs10', name: 'Qube Account', accessUrl: 'account.qubecinema.com', subscribedCompaniesCount: 5, lastUpdated: new Date().toISOString() },
 ];
+
+// Sort services alphabetically by name
+mockQubeServices.sort((a, b) => a.name.localeCompare(b.name));
+
 
 export const mockDashboardMetrics: DashboardMetrics = {
   totalCompanies: mockCompanies.length,
