@@ -32,43 +32,6 @@ const locations = [
     { city: "Issy-les-Moulineaux", state: "", country: "France" },
 ];
 
-const generateRandomCompanies = (count: number): Company[] => {
-    const companies: Company[] = [];
-    const usedNames = new Set<string>();
-
-    for (let i = 0; i < count; i++) {
-        let name = companyNames[Math.floor(Math.random() * companyNames.length)];
-        let attempt = 0;
-        while(usedNames.has(name) && attempt < companyNames.length * 2) { // Avoid infinite loop if count > companyNames.length
-            name = `${companyNames[Math.floor(Math.random() * companyNames.length)]} ${attempt > 0 ? attempt + 1 : ''}`.trim();
-            attempt++;
-        }
-        usedNames.add(name);
-
-        const loc = locations[Math.floor(Math.random() * locations.length)];
-        const services = mockQubeServices // Use the globally defined mockQubeServices
-                         .sort(() => 0.5 - Math.random())
-                         .slice(0, Math.floor(Math.random() * 4) + 2) // 2 to 5 services
-                         .map(s => s.name);
-        
-        const company: Company = {
-            id: `${i + 1}`,
-            name: name,
-            logoUrl: `https://placehold.co/100x100.png`,
-            location: `${loc.city}, ${loc.state ? loc.state + ', ' : ''}${loc.country === 'USA' && loc.state ? '' : loc.country}`,
-            subscribedServices: Array.from(new Set([...services, 'Qube Account'])),
-            status: Math.random() > 0.15 ? 'Active' : 'Inactive', // 85% active
-            lastUpdated: new Date(Date.now() - Math.floor(Math.random() * 365) * 24 * 60 * 60 * 1000).toISOString(),
-            contactInfo: { email: `contact@${name.toLowerCase().replace(/[^a-z0-9]/g, '')}.com`, phone: `555-${String(1000 + i).padStart(4, '0')}` },
-            address: { street: `${100 + i} Main St`, city: loc.city, state: loc.state, zip: `${90000 + i}`, country: loc.country },
-            data_ai_hint: name.split(" ")[0].toLowerCase() + (name.split(" ").length > 1 ? " " + name.split(" ")[1].toLowerCase() : "")
-        };
-        companies.push(company);
-    }
-    return companies;
-}
-
-
 // Define mockPortalUsers before mockQubeServices if it's used in its definition
 export const mockPortalUsers: PortalUser[] = [
   { id: 'pu1', name: 'Peter Pan', email: 'peter.pan@qubecinema.com', role: 'Admin', lastUpdatedOn: new Date().toISOString(), lastUpdatedBy: 'System' },
@@ -76,7 +39,7 @@ export const mockPortalUsers: PortalUser[] = [
   { id: 'pu3', name: 'John Doe', email: 'john.doe@qubecinema.com', role: 'Viewer', lastUpdatedOn: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(), lastUpdatedBy: 'Peter Pan' },
 ];
 
-// Define mockQubeServices first, as generateRandomCompanies might use it.
+// Define mockQubeServices first
 export let mockQubeServices: QubeService[] = [
   { id: 'qs1', name: 'Qube Wire Distributor', accessUrl: 'distributor.qubewire.com', subscribedCompaniesCount: 25, lastUpdated: new Date().toISOString() },
   { id: 'qs2', name: 'Qube Wire Exhibitor', accessUrl: 'exhibitor.qubewire.com', subscribedCompaniesCount: 150, lastUpdated: new Date().toISOString() },
@@ -92,14 +55,62 @@ export let mockQubeServices: QubeService[] = [
 mockQubeServices.sort((a, b) => a.name.localeCompare(b.name));
 
 
+const generateRandomCompanies = (count: number): Company[] => {
+    const companies: Company[] = [];
+    const usedNames = new Set<string>();
+
+    for (let i = 0; i < count; i++) {
+        let name = companyNames[i % companyNames.length]; // Cycle through names for more determinism if count > names.length
+        let attempt = 0;
+        let baseName = name;
+        while(usedNames.has(name) && attempt < companyNames.length * 2) {
+            name = `${baseName} ${attempt + 2}`; // Append numbers if name is taken
+            attempt++;
+        }
+        usedNames.add(name);
+
+        const loc = locations[i % locations.length]; // Cycle through locations
+        
+        // Deterministic selection of services
+        // mockQubeServices is already sorted alphabetically.
+        const numServicesToPick = (i % 3) + 1; // Pick 1, 2, or 3 services deterministically based on index `i`
+        const baseServices = mockQubeServices
+            .filter(s => s.name !== 'Qube Account') // Exclude Qube Account for now
+            .slice(0, numServicesToPick)           // Take the first N based on modulo
+            .map(s => s.name);
+        
+        const company: Company = {
+            id: `${i + 1}`,
+            name: name,
+            logoUrl: `https://placehold.co/100x100.png`, // Using placehold.co as configured
+            data_ai_hint: name.split(" ")[0].toLowerCase() + (name.split(" ").length > 1 ? " " + name.split(" ")[1].toLowerCase() : ""),
+            location: `${loc.city}, ${loc.state ? loc.state + ', ' : ''}${loc.country === 'USA' && loc.state ? '' : loc.country}`,
+            subscribedServices: Array.from(new Set([...baseServices, 'Qube Account'])), // Always include Qube Account
+            status: (i % 10 !== 0) ? 'Active' : 'Inactive', // ~90% active, deterministically
+            lastUpdated: new Date(Date.now() - (i % 365) * 24 * 60 * 60 * 1000).toISOString(),
+            contactInfo: { email: `contact@${name.toLowerCase().replace(/[^a-z0-9]/g, '')}.com`, phone: `555-${String(1000 + i).padStart(4, '0')}` },
+            address: { street: `${100 + i} Main St`, city: loc.city, state: loc.state, zip: `${90000 + i}`, country: loc.country },
+        };
+        companies.push(company);
+    }
+    return companies;
+}
+
 // Now generate mockCompanies
 export const mockCompanies: Company[] = generateRandomCompanies(50); // Generate 50 companies for better pagination demo
 
 // Update Qube Account service count
 const qubeAccountService = mockQubeServices.find(s => s.id === 'qs10');
 if (qubeAccountService) {
-    qubeAccountService.subscribedCompaniesCount = mockCompanies.length + mockPortalUsers.length;
+    qubeAccountService.subscribedCompaniesCount = mockCompanies.filter(c => c.subscribedServices.includes('Qube Account')).length;
 }
+
+// Ensure all companies have "Qube Account" (already handled in generateRandomCompanies, but as a safeguard)
+mockCompanies.forEach(company => {
+  if (!company.subscribedServices.includes('Qube Account')) {
+    company.subscribedServices.push('Qube Account');
+  }
+});
 
 
 const firstNames = ["Alice", "Bob", "Charlie", "David", "Eve", "Fiona", "George", "Hannah", "Ian", "Julia", "Kevin", "Laura", "Michael", "Nora", "Oscar", "Pamela", "Quentin", "Rachel", "Steven", "Tina", "Usman", "Violet", "Walter", "Xenia", "Yannick", "Zoe"];
@@ -108,19 +119,23 @@ const domains = ["example.com", "test.org", "sample.net", "demo.co"];
 
 
 export const mockCompanyUsers: User[] = Array.from({ length: 40 }, (_, i) => {
-  const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
-  const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
-  const emailName = `${firstName.toLowerCase()}.${lastName.toLowerCase()}${Math.random() > 0.5 ? i : ''}`;
-  const numServices = Math.floor(Math.random() * 3) + 1; // 1 to 3 services
+  const firstName = firstNames[i % firstNames.length];
+  const lastName = lastNames[i % lastNames.length];
+  const emailName = `${firstName.toLowerCase()}.${lastName.toLowerCase()}${ (i >= firstNames.length || i >= lastNames.length) ? Math.floor(i / firstNames.length) : ''}`;
   
-  const companyServices = [...mockQubeServices].sort(() => 0.5 - Math.random()).slice(0, numServices).map(s => s.name);
+  // Deterministic selection of services for users
+  const numServices = (i % 2) + 1; // 1 or 2 services + Qube Account
+  const companyServices = mockQubeServices
+      .filter(s => s.name !== 'Qube Account')
+      .slice(i % mockQubeServices.length, (i % mockQubeServices.length) + numServices) // Cycle through services
+      .map(s => s.name);
 
   return {
     id: `cu${i + 1}`,
     name: `${firstName} ${lastName}`,
-    email: `${emailName}@${domains[Math.floor(Math.random() * domains.length)]}`,
+    email: `${emailName}@${domains[i % domains.length]}`,
     associatedServices: Array.from(new Set([...companyServices, 'Qube Account'])), 
-    status: Math.random() > 0.2 ? 'Active' : 'Inactive', 
+    status: (i % 5 !== 0) ? 'Active' : 'Inactive',  // ~80% active
   };
 });
 
@@ -145,3 +160,19 @@ if (mockCompanies.length > 0 && mockCompanies[0]) {
       mockRecentActivities[1].description = `User ${mockCompanyUsers[0].name} added to ${mockCompanies[0].name}.`;
     }
 }
+
+// Update Qube Account service count based on final data
+if (qubeAccountService) {
+    qubeAccountService.subscribedCompaniesCount = mockCompanies.length; // All companies subscribe
+}
+// Update other service counts based on company subscriptions
+mockQubeServices.forEach(service => {
+  if (service.name !== 'Qube Account') {
+    service.subscribedCompaniesCount = mockCompanies.filter(
+      company => company.status === 'Active' && company.subscribedServices.includes(service.name)
+    ).length;
+  }
+});
+
+mockQubeServices.sort((a, b) => a.name.localeCompare(b.name)); // Ensure it's sorted finally
+
