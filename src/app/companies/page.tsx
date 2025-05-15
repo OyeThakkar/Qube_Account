@@ -201,7 +201,7 @@ export default function CompanyManagementPage() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem asChild>
-                        <Link href={`/companies/${company.id}`}><Edit3 className="mr-2 h-4 w-4" /> Edit</Link>
+                        <Link href={`/companies/${company.id}/edit`}><Edit3 className="mr-2 h-4 w-4" /> Edit</Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem className="text-destructive focus:text-destructive-foreground focus:bg-destructive">
                         <Trash2 className="mr-2 h-4 w-4" /> Deactivate
