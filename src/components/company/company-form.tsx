@@ -98,8 +98,11 @@ export default function CompanyForm({ company }: CompanyFormProps) {
     });
 
     if (!company) {
+      // Only redirect if it's a new company creation
       router.push('/companies');
     }
+    // If it's an edit, we might want to stay on the page or redirect to the company profile.
+    // For now, it stays on the edit page after saving.
   }
 
   return (
@@ -152,7 +155,7 @@ export default function CompanyForm({ company }: CompanyFormProps) {
                     <FormItem>
                       <FormLabel>Company UUID</FormLabel>
                       <FormControl><Input placeholder="System Generated" {...field} disabled={!!company} /></FormControl>
-                      <FormDescription>Unique identifier, usually system-generated.</FormDescription>
+                      <FormDescription>Unique identifier, system-generated and cannot be modified.</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
