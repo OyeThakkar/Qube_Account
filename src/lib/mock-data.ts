@@ -5,40 +5,97 @@ import { Building2, UserPlus, ServerCog, ShieldCheck } from 'lucide-react';
 export const mockCompanies: Company[] = [
   {
     id: '1',
-    name: 'Innovatech Solutions',
-    logoUrl: 'https://picsum.photos/100/100?random=1',
-    location: 'San Francisco, CA',
+    name: 'Warner Bros. Entertainment',
+    logoUrl: 'https://placehold.co/100x100.png',
+    location: 'Burbank, CA',
     subscribedServices: ['Qube Wire Distributor', 'Qube Slate'],
     status: 'Active',
     lastUpdated: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-    contactInfo: { email: 'contact@innovatech.com', phone: '555-0101' },
-    address: { street: '123 Tech Lane', city: 'San Francisco', state: 'CA', zip: '94107', country: 'USA' },
-    billingInfo: 'Net 30, PO #12345',
-    deliveryInfo: 'Digital via Qube Wire',
-    notes: 'Key client, priority support.',
+    contactInfo: { email: 'contact@warnerbros.com', phone: '555-0101' },
+    address: { street: '4000 Warner Blvd', city: 'Burbank', state: 'CA', zip: '91522', country: 'USA' },
+    billingInfo: 'Net 30, PO #WBE12345',
+    deliveryInfo: 'Digital via Qube Wire, Physical to WH',
+    notes: 'Major studio partner.',
+    data_ai_hint: 'movie studio'
   },
   {
     id: '2',
-    name: 'Synergy Corp',
-    logoUrl: 'https://picsum.photos/100/100?random=2',
+    name: 'A24 Films',
+    logoUrl: 'https://placehold.co/100x100.png',
     location: 'New York, NY',
     subscribedServices: ['Qube Wire Exhibitor', 'iCount', 'MovieBuff Access'],
     status: 'Active',
     lastUpdated: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-    contactInfo: { email: 'info@synergy.com', phone: '555-0202' },
-    address: { street: '456 Business Ave', city: 'New York', state: 'NY', zip: '10001', country: 'USA' },
+    contactInfo: { email: 'info@a24films.com', phone: '555-0202' },
+    address: { street: '31 W 27th St', city: 'New York', state: 'NY', zip: '10001', country: 'USA' },
+    data_ai_hint: 'indie film'
   },
   {
     id: '3',
-    name: 'Future Forward Inc.',
-    logoUrl: 'https://picsum.photos/100/100?random=3',
-    location: 'Austin, TX',
+    name: 'StudioCanal',
+    logoUrl: 'https://placehold.co/100x100.png',
+    location: 'Issy-les-Moulineaux, France',
     subscribedServices: ['Qube Cinemas', 'CinemasDB'],
-    status: 'Inactive',
-    lastUpdated: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
-    contactInfo: { email: 'support@futureforward.com', phone: '555-0303' },
-    address: { street: '789 Innovation Dr', city: 'Austin', state: 'TX', zip: '78701', country: 'USA' },
+    status: 'Active', 
+    lastUpdated: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+    contactInfo: { email: 'acquisition@studiocanal.com', phone: '+33 1 71 35 35 35' },
+    address: { street: '1 Place du Spectacle', city: 'Issy-les-Moulineaux', state: 'N/A', zip: '92130', country: 'France' },
+    notes: 'Leading European film distributor.',
+    data_ai_hint: 'european cinema'
   },
+  {
+    id: '4',
+    name: 'Pixar Animation Studios',
+    logoUrl: 'https://placehold.co/100x100.png',
+    location: 'Emeryville, CA',
+    subscribedServices: ['Qube Wire Distributor', 'Qube Slate', 'iCount'],
+    status: 'Active',
+    lastUpdated: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+    contactInfo: { email: 'production@pixar.com', phone: '555-0404' },
+    address: { street: '1200 Park Ave', city: 'Emeryville', state: 'CA', zip: '94608', country: 'USA' },
+    billingInfo: 'Net 60',
+    deliveryInfo: 'Digital only',
+    data_ai_hint: 'animation studio'
+  },
+  {
+    id: '5',
+    name: 'Roadshow Entertainment',
+    logoUrl: 'https://placehold.co/100x100.png',
+    location: 'Sydney, AU',
+    subscribedServices: ['MovieBuff Access', 'CinemasDB'],
+    status: 'Inactive',
+    lastUpdated: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+    contactInfo: { email: 'contact@roadshow.com.au', phone: '+61 2 9552 8600' },
+    address: { street: 'Village Roadshow Centre, Level 1, 235 Pyrmont Street', city: 'Pyrmont', state: 'NSW', zip: '2009', country: 'Australia' },
+    notes: 'Major Australian distributor.',
+    data_ai_hint: 'film distributor'
+  },
+  {
+    id: '6',
+    name: 'Universal Pictures',
+    logoUrl: 'https://placehold.co/100x100.png',
+    location: 'Universal City, CA',
+    subscribedServices: ['Qube Wire Distributor', 'Qube Cinemas', 'iCount'],
+    status: 'Active',
+    lastUpdated: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    contactInfo: { email: 'guestrelations@nbcuni.com', phone: '555-0505' },
+    address: { street: '100 Universal City Plaza', city: 'Universal City', state: 'CA', zip: '91608', country: 'USA' },
+    notes: 'One of the "Big Five" studios.',
+    data_ai_hint: 'major studio'
+  },
+  {
+    id: '7',
+    name: 'Neon Rated',
+    logoUrl: 'https://placehold.co/100x100.png',
+    location: 'New York, NY',
+    subscribedServices: ['Qube Wire Exhibitor', 'MovieBuff Access'],
+    status: 'Active',
+    lastUpdated: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
+    contactInfo: { email: 'info@neonrated.com', phone: '555-0606' },
+    address: { street: '580 Broadway', city: 'New York', state: 'NY', zip: '10012', country: 'USA' },
+    notes: 'Distributor of acclaimed independent films.',
+    data_ai_hint: 'indie distributor'
+  }
 ];
 
 const firstNames = ["Alice", "Bob", "Charlie", "David", "Eve", "Fiona", "George", "Hannah", "Ian", "Julia", "Kevin", "Laura", "Michael", "Nora", "Oscar", "Pamela", "Quentin", "Rachel", "Steven", "Tina", "Usman", "Violet", "Walter", "Xenia", "Yannick", "Zoe"];
@@ -93,9 +150,16 @@ export const mockDashboardMetrics: DashboardMetrics = {
 };
 
 export const mockRecentActivities: RecentActivity[] = [
-  { id: 'ra1', description: 'New company "Innovatech Solutions" onboarded.', timestamp: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(), user: 'Peter Pan', type: 'CompanyUpdate', icon: Building2 },
-  { id: 'ra2', description: `User ${mockCompanyUsers[0].name} added to Innovatech.`, timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), user: 'Peter Pan', type: 'UserUpdate', icon: UserPlus },
+  { id: 'ra1', description: `New company "Warner Bros. Entertainment" onboarded.`, timestamp: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(), user: 'Peter Pan', type: 'CompanyUpdate', icon: Building2 },
+  { id: 'ra2', description: `User ${mockCompanyUsers[0].name} added to Warner Bros. Entertainment.`, timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), user: 'Peter Pan', type: 'UserUpdate', icon: UserPlus },
   { id: 'ra3', description: 'Qube Wire Exhibitor service updated.', timestamp: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(), type: 'ServiceSubscription', icon: ServerCog },
   { id: 'ra4', description: 'System maintenance scheduled for tomorrow.', timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(), type: 'System', icon: ShieldCheck },
 ];
 
+// Update recent activities to use the new company names
+if (mockCompanies.length > 0 && mockCompanies[0]) { // Check if mockCompanies[0] exists
+    mockRecentActivities[0].description = `New company "${mockCompanies[0].name}" onboarded.`;
+    if (mockCompanyUsers.length > 0 && mockCompanyUsers[0]) { // Check if mockCompanyUsers[0] exists
+      mockRecentActivities[1].description = `User ${mockCompanyUsers[0].name} added to ${mockCompanies[0].name}.`;
+    }
+}
