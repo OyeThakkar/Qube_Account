@@ -74,12 +74,12 @@ export default function CompanyManagementPage() {
               <TableRow key={company.id}>
                 <TableCell>
                   <Image
-                    src={company.logoUrl || `https://picsum.photos/seed/${company.id}/40/40`}
+                    src={company.logoUrl || `https://placehold.co/40x40.png`}
                     alt={`${company.name} logo`}
                     width={40}
                     height={40}
                     className="rounded-md object-cover"
-                    data-ai-hint="company logo"
+                    data-ai-hint={company.data_ai_hint || "company logo"}
                   />
                 </TableCell>
                 <TableCell className="font-medium">

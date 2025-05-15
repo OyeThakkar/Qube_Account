@@ -42,12 +42,12 @@ export default function CompanyProfilePage({ params }: CompanyProfilePageProps) 
 
       <div className="flex items-center space-x-4 mb-6">
         <Image
-            src={company.logoUrl || `https://picsum.photos/seed/${params.id}/80/80`}
+            src={company.logoUrl || `https://placehold.co/80x80.png`}
             alt={`${company.name} logo`}
             width={80}
             height={80}
             className="rounded-lg object-cover border"
-            data-ai-hint="company logo large"
+            data-ai-hint={company.data_ai_hint || "company logo large"}
         />
         <div>
             <h2 className="text-xl font-semibold">{company.name}</h2>
