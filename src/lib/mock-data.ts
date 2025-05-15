@@ -8,7 +8,7 @@ export const mockCompanies: Company[] = [
     name: 'Warner Bros. Entertainment',
     logoUrl: 'https://placehold.co/100x100.png',
     location: 'Burbank, CA',
-    subscribedServices: ['Qube Wire Distributor', 'Qube Slate'],
+    subscribedServices: ['Qube Wire Distributor', 'Qube Slate', 'Qube Account'],
     status: 'Active',
     lastUpdated: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
     contactInfo: { email: 'contact@warnerbros.com', phone: '555-0101' },
@@ -23,7 +23,7 @@ export const mockCompanies: Company[] = [
     name: 'A24 Films',
     logoUrl: 'https://placehold.co/100x100.png',
     location: 'New York, NY',
-    subscribedServices: ['Qube Wire Exhibitor', 'iCount', 'MovieBuff Access'],
+    subscribedServices: ['Qube Wire Exhibitor', 'iCount', 'MovieBuff Access', 'Qube Account'],
     status: 'Active',
     lastUpdated: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
     contactInfo: { email: 'info@a24films.com', phone: '555-0202' },
@@ -35,8 +35,8 @@ export const mockCompanies: Company[] = [
     name: 'StudioCanal',
     logoUrl: 'https://placehold.co/100x100.png',
     location: 'Issy-les-Moulineaux, France',
-    subscribedServices: ['Qube Cinemas', 'CinemasDB'],
-    status: 'Active', 
+    subscribedServices: ['Qube Cinemas', 'CinemasDB', 'Qube Account'],
+    status: 'Active',
     lastUpdated: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
     contactInfo: { email: 'acquisition@studiocanal.com', phone: '+33 1 71 35 35 35' },
     address: { street: '1 Place du Spectacle', city: 'Issy-les-Moulineaux', state: 'N/A', zip: '92130', country: 'France' },
@@ -48,7 +48,7 @@ export const mockCompanies: Company[] = [
     name: 'Pixar Animation Studios',
     logoUrl: 'https://placehold.co/100x100.png',
     location: 'Emeryville, CA',
-    subscribedServices: ['Qube Wire Distributor', 'Qube Slate', 'iCount'],
+    subscribedServices: ['Qube Wire Distributor', 'Qube Slate', 'iCount', 'Qube Account'],
     status: 'Active',
     lastUpdated: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
     contactInfo: { email: 'production@pixar.com', phone: '555-0404' },
@@ -62,7 +62,7 @@ export const mockCompanies: Company[] = [
     name: 'Roadshow Entertainment',
     logoUrl: 'https://placehold.co/100x100.png',
     location: 'Sydney, AU',
-    subscribedServices: ['MovieBuff Access', 'CinemasDB'],
+    subscribedServices: ['MovieBuff Access', 'CinemasDB', 'Qube Account'],
     status: 'Inactive',
     lastUpdated: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
     contactInfo: { email: 'contact@roadshow.com.au', phone: '+61 2 9552 8600' },
@@ -75,7 +75,7 @@ export const mockCompanies: Company[] = [
     name: 'Universal Pictures',
     logoUrl: 'https://placehold.co/100x100.png',
     location: 'Universal City, CA',
-    subscribedServices: ['Qube Wire Distributor', 'Qube Cinemas', 'iCount'],
+    subscribedServices: ['Qube Wire Distributor', 'Qube Cinemas', 'iCount', 'Qube Account'],
     status: 'Active',
     lastUpdated: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
     contactInfo: { email: 'guestrelations@nbcuni.com', phone: '555-0505' },
@@ -88,7 +88,7 @@ export const mockCompanies: Company[] = [
     name: 'Neon Rated',
     logoUrl: 'https://placehold.co/100x100.png',
     location: 'New York, NY',
-    subscribedServices: ['Qube Wire Exhibitor', 'MovieBuff Access'],
+    subscribedServices: ['Qube Wire Exhibitor', 'MovieBuff Access', 'Qube Account'],
     status: 'Active',
     lastUpdated: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
     contactInfo: { email: 'info@neonrated.com', phone: '555-0606' },
@@ -96,7 +96,10 @@ export const mockCompanies: Company[] = [
     notes: 'Distributor of acclaimed independent films.',
     data_ai_hint: 'indie distributor'
   }
-];
+].map(company => ({
+    ...company,
+    subscribedServices: Array.from(new Set([...company.subscribedServices, 'Qube Account']))
+}));
 
 const firstNames = ["Alice", "Bob", "Charlie", "David", "Eve", "Fiona", "George", "Hannah", "Ian", "Julia", "Kevin", "Laura", "Michael", "Nora", "Oscar", "Pamela", "Quentin", "Rachel", "Steven", "Tina", "Usman", "Violet", "Walter", "Xenia", "Yannick", "Zoe"];
 const lastNames = ["Smith", "Jones", "Williams", "Brown", "Davis", "Miller", "Wilson", "Moore", "Taylor", "Anderson", "Thomas", "Jackson", "White", "Harris", "Martin", "Thompson", "Garcia", "Martinez", "Robinson", "Clark"];
@@ -132,12 +135,12 @@ export const mockCompanyUsers: User[] = Array.from({ length: 40 }, (_, i) => {
   const numServices = Math.floor(Math.random() * 3) + 1; // 1 to 3 services
   // Ensure mockQubeServices is fully defined and sorted before using it here
   const companyServices = [...mockQubeServices].sort(() => 0.5 - Math.random()).slice(0, numServices).map(s => s.name);
-  
+
   return {
     id: `cu${i + 1}`,
     name: `${firstName} ${lastName}`,
     email: `${emailName}@${domains[Math.floor(Math.random() * domains.length)]}`,
-    associatedServices: companyServices,
+    associatedServices: Array.from(new Set([...companyServices, 'Qube Account'])), // Ensure Qube Account is always present
     status: Math.random() > 0.2 ? 'Active' : 'Inactive', // 80% active
   };
 });
@@ -151,7 +154,7 @@ export const mockDashboardMetrics: DashboardMetrics = {
 
 export const mockRecentActivities: RecentActivity[] = [
   { id: 'ra1', description: `New company "Warner Bros. Entertainment" onboarded.`, timestamp: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(), user: 'Peter Pan', type: 'CompanyUpdate', icon: Building2 },
-  { id: 'ra2', description: `User ${mockCompanyUsers[0].name} added to Warner Bros. Entertainment.`, timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), user: 'Peter Pan', type: 'UserUpdate', icon: UserPlus },
+  { id: 'ra2', description: `User ${mockCompanyUsers[0]?.name || 'A User'} added to Warner Bros. Entertainment.`, timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), user: 'Peter Pan', type: 'UserUpdate', icon: UserPlus },
   { id: 'ra3', description: 'Qube Wire Exhibitor service updated.', timestamp: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(), type: 'ServiceSubscription', icon: ServerCog },
   { id: 'ra4', description: 'System maintenance scheduled for tomorrow.', timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(), type: 'System', icon: ShieldCheck },
 ];
