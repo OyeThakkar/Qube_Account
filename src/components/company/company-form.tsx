@@ -81,7 +81,7 @@ export default function CompanyForm({ company }: CompanyFormProps) {
       billingInfo: company?.billingInfo || "",
       deliveryInfo: company?.deliveryInfo || "",
       notes: company?.notes || "",
-      subscribedServices: company?.subscribedServices || [],
+      subscribedServices: company?.subscribedServices || ['Qube Account'], // Ensure Qube Account is default
       companyEmailDomains: company?.userOnboarding?.companyEmailDomains.join(', ') || "",
       excludedDomains: company?.userOnboarding?.excludedDomains.join(', ') || "",
       isExclusiveDomain: company?.userOnboarding?.isExclusiveDomain || false,
@@ -90,10 +90,14 @@ export default function CompanyForm({ company }: CompanyFormProps) {
   });
 
   function onSubmit(data: CompanyFormValues) {
-    console.log(data);
+    // Ensure Qube Account is always in subscribedServices upon submission
+    const finalSubscribedServices = Array.from(new Set([...(data.subscribedServices || []), 'Qube Account']));
+    const submissionData = { ...data, subscribedServices: finalSubscribedServices };
+    
+    console.log(submissionData);
     toast({
       title: company ? "Company Updated" : "Company Created",
-      description: `${data.displayName} details have been ${company ? 'updated' : 'saved'}.`,
+      description: `${submissionData.displayName} details have been ${company ? 'updated' : 'saved'}.`,
       variant: "default",
     });
 
@@ -154,7 +158,7 @@ export default function CompanyForm({ company }: CompanyFormProps) {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Company UUID</FormLabel>
-                      <FormControl><Input placeholder="System Generated" {...field} disabled={!!company} /></FormControl>
+                      <FormControl><Input placeholder="System Generated" {...field} disabled={!!company || !form.formState.isDirty} /></FormControl>
                       <FormDescription>Unique identifier, system-generated and cannot be modified.</FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -428,36 +432,41 @@ export default function CompanyForm({ company }: CompanyFormProps) {
                 name="subscribedServices"
                 render={() => (
                   <FormItem>
-                    {mockQubeServices.map((service) => (
-                      <FormField
-                        key={service.id}
-                        control={form.control}
-                        name="subscribedServices"
-                        render={({ field }) => {
-                          return (
-                            <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                              <FormControl>
-                                <Checkbox
-                                  checked={field.value?.includes(service.name)}
-                                  onCheckedChange={(checked) => {
-                                    return checked
-                                      ? field.onChange([...(field.value || []), service.name])
-                                      : field.onChange(
-                                          (field.value || []).filter(
-                                            (value) => value !== service.name
-                                          )
-                                        )
-                                  }}
-                                />
-                              </FormControl>
-                              <FormLabel className="font-normal">
-                                {service.name}
-                              </FormLabel>
-                            </FormItem>
-                          )
-                        }}
-                      />
-                    ))}
+                    {mockQubeServices.map((service) => {
+                      const isQubeAccountService = service.name === 'Qube Account';
+                      return (
+                        <FormField
+                          key={service.id}
+                          control={form.control}
+                          name="subscribedServices"
+                          render={({ field }) => {
+                            return (
+                              <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                                <FormControl>
+                                  <Checkbox
+                                    checked={isQubeAccountService || field.value?.includes(service.name)}
+                                    disabled={isQubeAccountService}
+                                    onCheckedChange={(checked) => {
+                                      if (isQubeAccountService) return; // Prevent unchecking Qube Account
+                                      return checked
+                                        ? field.onChange([...(field.value || []), service.name])
+                                        : field.onChange(
+                                            (field.value || []).filter(
+                                              (value) => value !== service.name
+                                            )
+                                          );
+                                    }}
+                                  />
+                                </FormControl>
+                                <FormLabel className="font-normal">
+                                  {service.name}
+                                </FormLabel>
+                              </FormItem>
+                            );
+                          }}
+                        />
+                      );
+                    })}
                     <FormMessage />
                   </FormItem>
                 )}
