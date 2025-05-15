@@ -1,4 +1,7 @@
 
+"use client"; // Added "use client" for state and event handlers
+
+import React, { useState, useMemo } from 'react'; // Added useState and useMemo
 import PageHeader from '@/components/shared/page-header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,10 +20,85 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+  PaginationEllipsis,
+} from "@/components/ui/pagination"; // Added pagination imports
+
+const ITEMS_PER_PAGE = 10; // Define items per page
 
 export default function CompanyManagementPage() {
-  const companies: Company[] = mockCompanies;
-  // TODO: Implement actual search and filter logic
+  // const companies: Company[] = mockCompanies; // Original
+  // TODO: Implement actual search and filter logic from backend/database
+  const [searchTerm, setSearchTerm] = useState('');
+  const [serviceFilter, setServiceFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const filteredCompanies = useMemo(() => {
+    return mockCompanies.filter(company => {
+      const matchesSearch = company.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                            company.location.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesService = serviceFilter ? company.subscribedServices.includes(serviceFilter) : true;
+      const matchesStatus = statusFilter ? company.status === statusFilter : true;
+      return matchesSearch && matchesService && matchesStatus;
+    });
+  }, [searchTerm, serviceFilter, statusFilter]);
+
+  const totalPages = Math.ceil(filteredCompanies.length / ITEMS_PER_PAGE);
+  const paginatedCompanies = filteredCompanies.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const getPaginationItems = () => {
+    const items = [];
+    const maxPagesToShow = 5; 
+    const halfMaxPages = Math.floor(maxPagesToShow / 2);
+
+    if (totalPages <= maxPagesToShow) {
+      for (let i = 1; i <= totalPages; i++) {
+        items.push(i);
+      }
+    } else {
+      items.push(1); 
+      if (currentPage > halfMaxPages + 1 && totalPages > maxPagesToShow) {
+         if (currentPage > halfMaxPages + 2) items.push("ellipsis_start");
+      }
+
+      let startPage = Math.max(2, currentPage - halfMaxPages + (currentPage + halfMaxPages >= totalPages ? totalPages - (currentPage + halfMaxPages) -1 : 0) );
+      // Ensure startPage doesn't cause overlap with first page if ellipsis isn't needed
+      if (startPage <= 2 && currentPage > halfMaxPages +1) startPage = currentPage - halfMaxPages +1;
+
+
+      let endPage = Math.min(totalPages - 1, startPage + maxPagesToShow - 3);
+       if (currentPage <= halfMaxPages) endPage = Math.min(totalPages -1, maxPagesToShow-1);
+
+
+      for (let i = startPage; i <= endPage; i++) {
+        items.push(i);
+      }
+
+      if (currentPage < totalPages - halfMaxPages && totalPages > maxPagesToShow) {
+         if (currentPage < totalPages - halfMaxPages -1 ) items.push("ellipsis_end");
+      }
+      items.push(totalPages); 
+    }
+    return items.filter((item, index, self) => { // Remove duplicates that might arise from edge cases
+        if(typeof item === 'string' && typeof self[index-1] === 'string' && item.startsWith('ellipsis') && self[index-1]?.toString().startsWith('ellipsis')) return false;
+        return self.indexOf(item) === index || typeof item === 'string';
+    });
+  };
+
 
   return (
     <>
@@ -33,23 +111,31 @@ export default function CompanyManagementPage() {
       <div className="mb-6 flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input type="search" placeholder="Search companies..." className="pl-8 w-full" />
+          <Input 
+            type="search" 
+            placeholder="Search companies..." 
+            className="pl-8 w-full" 
+            value={searchTerm}
+            onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
+          />
         </div>
-        <Select>
+        <Select value={serviceFilter} onValueChange={(value) => { setServiceFilter(value === "All Services" ? "" : value); setCurrentPage(1);}}>
           <SelectTrigger className="w-full sm:w-[180px]">
             <SelectValue placeholder="Filter by service" />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="All Services">All Services</SelectItem>
             {mockQubeServices.map(service => (
               <SelectItem key={service.id} value={service.name}>{service.name}</SelectItem>
             ))}
           </SelectContent>
         </Select>
-        <Select>
+        <Select value={statusFilter} onValueChange={(value) => { setStatusFilter(value === "All Statuses" ? "" : value); setCurrentPage(1);}}>
           <SelectTrigger className="w-full sm:w-[180px]">
             <SelectValue placeholder="Filter by status" />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="All Statuses">All Statuses</SelectItem>
             <SelectItem value="Active">Active</SelectItem>
             <SelectItem value="Inactive">Inactive</SelectItem>
           </SelectContent>
@@ -70,7 +156,7 @@ export default function CompanyManagementPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {companies.map((company) => (
+            {paginatedCompanies.map((company) => (
               <TableRow key={company.id}>
                 <TableCell>
                   <Image
@@ -125,10 +211,54 @@ export default function CompanyManagementPage() {
                 </TableCell>
               </TableRow>
             ))}
+             {paginatedCompanies.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={7} className="h-24 text-center">
+                  No companies found matching your criteria.
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </div>
-      {/* TODO: Add pagination */}
+      
+      {totalPages > 1 && (
+        <Pagination className="mt-6">
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious 
+                href="#" 
+                onClick={(e) => { e.preventDefault(); if(currentPage > 1) handlePageChange(currentPage - 1);}} 
+                className={currentPage === 1 ? "pointer-events-none opacity-50" : undefined}
+                aria-disabled={currentPage === 1}
+              />
+            </PaginationItem>
+            {getPaginationItems().map((item, index) => (
+              <PaginationItem key={index}>
+                {typeof item === 'number' ? (
+                  <PaginationLink 
+                    href="#" 
+                    onClick={(e) => { e.preventDefault(); handlePageChange(item);}}
+                    isActive={currentPage === item}
+                  >
+                    {item}
+                  </PaginationLink>
+                ) : (
+                  <PaginationEllipsis />
+                )}
+              </PaginationItem>
+            ))}
+            <PaginationItem>
+              <PaginationNext 
+                href="#" 
+                onClick={(e) => { e.preventDefault(); if(currentPage < totalPages) handlePageChange(currentPage + 1);}}
+                className={currentPage === totalPages ? "pointer-events-none opacity-50" : undefined}
+                aria-disabled={currentPage === totalPages}
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+      )}
     </>
   );
 }
