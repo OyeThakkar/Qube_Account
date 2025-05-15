@@ -57,39 +57,50 @@ mockQubeServices.sort((a, b) => a.name.localeCompare(b.name));
 
 const generateRandomCompanies = (count: number): Company[] => {
     const companies: Company[] = [];
-    const usedNames = new Set<string>();
+    const usedLegalNames = new Set<string>();
 
     for (let i = 0; i < count; i++) {
-        let name = companyNames[i % companyNames.length]; // Cycle through names for more determinism if count > names.length
+        let legalName = companyNames[i % companyNames.length];
         let attempt = 0;
-        let baseName = name;
-        while(usedNames.has(name) && attempt < companyNames.length * 2) {
-            name = `${baseName} ${attempt + 2}`; // Append numbers if name is taken
+        let baseLegalName = legalName;
+        while(usedLegalNames.has(legalName) && attempt < companyNames.length * 2) {
+            legalName = `${baseLegalName} ${attempt + 2}`;
             attempt++;
         }
-        usedNames.add(name);
+        usedLegalNames.add(legalName);
 
-        const loc = locations[i % locations.length]; // Cycle through locations
+        const loc = locations[i % locations.length];
         
-        // Deterministic selection of services
-        // mockQubeServices is already sorted alphabetically.
-        const numServicesToPick = (i % 3) + 1; // Pick 1, 2, or 3 services deterministically based on index `i`
+        const numServicesToPick = (i % 3) + 1; 
         const baseServices = mockQubeServices
-            .filter(s => s.name !== 'Qube Account') // Exclude Qube Account for now
-            .slice(0, numServicesToPick)           // Take the first N based on modulo
+            .filter(s => s.name !== 'Qube Account') 
+            .slice(0, numServicesToPick)          
             .map(s => s.name);
         
         const company: Company = {
             id: `${i + 1}`,
-            name: name,
-            logoUrl: `https://placehold.co/100x100.png`, // Using placehold.co as configured
-            data_ai_hint: name.split(" ")[0].toLowerCase() + (name.split(" ").length > 1 ? " " + name.split(" ")[1].toLowerCase() : ""),
-            location: `${loc.city}, ${loc.state ? loc.state + ', ' : ''}${loc.country === 'USA' && loc.state ? '' : loc.country}`,
-            subscribedServices: Array.from(new Set([...baseServices, 'Qube Account'])), // Always include Qube Account
-            status: (i % 10 !== 0) ? 'Active' : 'Inactive', // ~90% active, deterministically
+            legalName: legalName,
+            displayName: legalName, // Can be same as legal name initially
+            companyCode: `${legalName.substring(0,3).toUpperCase()}${100+i}`,
+            companyUuid: `uuid-${Date.now()}-${i}`,
+            logoUrl: `https://placehold.co/100x100.png`,
+            data_ai_hint: legalName.split(" ")[0].toLowerCase() + (legalName.split(" ").length > 1 ? " " + legalName.split(" ")[1].toLowerCase() : ""),
+            // location: `${loc.city}, ${loc.state ? loc.state + ', ' : ''}${loc.country === 'USA' && loc.state ? '' : loc.country}`, // Removed
+            subscribedServices: Array.from(new Set([...baseServices, 'Qube Account'])), 
+            status: (i % 10 !== 0) ? 'Active' : 'Inactive', 
             lastUpdated: new Date(Date.now() - (i % 365) * 24 * 60 * 60 * 1000).toISOString(),
-            contactInfo: { email: `contact@${name.toLowerCase().replace(/[^a-z0-9]/g, '')}.com`, phone: `555-${String(1000 + i).padStart(4, '0')}` },
+            contactInfo: { 
+                email: `contact@${legalName.toLowerCase().replace(/[^a-z0-9]/g, '')}.com`, 
+                phone: `555-${String(1000 + i).padStart(4, '0')}`,
+                website: `https://${legalName.toLowerCase().replace(/[^a-z0-9]/g, '')}.com`
+            },
             address: { street: `${100 + i} Main St`, city: loc.city, state: loc.state, zip: `${90000 + i}`, country: loc.country },
+            userOnboarding: {
+                companyEmailDomains: [`${legalName.toLowerCase().replace(/[^a-z0-9]/g, '')}.com`, `corp.${legalName.toLowerCase().replace(/[^a-z0-9]/g, '')}.org`],
+                excludedDomains: i % 5 === 0 ? ['gmail.com', 'outlook.com'] : [],
+                isExclusiveDomain: i % 2 === 0,
+                autoAddUsers: i % 3 === 0,
+            },
         };
         companies.push(company);
     }
@@ -147,17 +158,17 @@ export const mockDashboardMetrics: DashboardMetrics = {
 };
 
 export const mockRecentActivities: RecentActivity[] = [
-  { id: 'ra1', description: `New company "${mockCompanies[0]?.name || 'Sample Company Inc.'}" onboarded.`, timestamp: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(), user: 'Peter Pan', type: 'CompanyUpdate', icon: Building2 },
-  { id: 'ra2', description: `User ${mockCompanyUsers[0]?.name || 'A User'} added to ${mockCompanies[0]?.name || 'Sample Company Inc.'}.`, timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), user: 'Peter Pan', type: 'UserUpdate', icon: UserPlus },
+  { id: 'ra1', description: `New company "${mockCompanies[0]?.displayName || 'Sample Company Inc.'}" onboarded.`, timestamp: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(), user: 'Peter Pan', type: 'CompanyUpdate', icon: Building2 },
+  { id: 'ra2', description: `User ${mockCompanyUsers[0]?.name || 'A User'} added to ${mockCompanies[0]?.displayName || 'Sample Company Inc.'}.`, timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), user: 'Peter Pan', type: 'UserUpdate', icon: UserPlus },
   { id: 'ra3', description: 'Qube Wire Exhibitor service updated.', timestamp: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(), type: 'ServiceSubscription', icon: ServerCog },
   { id: 'ra4', description: 'System maintenance scheduled for tomorrow.', timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(), type: 'System', icon: ShieldCheck },
 ];
 
 // Update recent activities to use the new company names
 if (mockCompanies.length > 0 && mockCompanies[0]) { 
-    mockRecentActivities[0].description = `New company "${mockCompanies[0].name}" onboarded.`;
+    mockRecentActivities[0].description = `New company "${mockCompanies[0].displayName}" onboarded.`;
     if (mockCompanyUsers.length > 0 && mockCompanyUsers[0]) { 
-      mockRecentActivities[1].description = `User ${mockCompanyUsers[0].name} added to ${mockCompanies[0].name}.`;
+      mockRecentActivities[1].description = `User ${mockCompanyUsers[0].name} added to ${mockCompanies[0].displayName}.`;
     }
 }
 
@@ -175,4 +186,3 @@ mockQubeServices.forEach(service => {
 });
 
 mockQubeServices.sort((a, b) => a.name.localeCompare(b.name)); // Ensure it's sorted finally
-

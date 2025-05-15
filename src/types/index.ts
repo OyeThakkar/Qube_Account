@@ -1,15 +1,19 @@
 
 export interface Company {
   id: string;
-  name: string;
+  legalName: string; // Renamed from name
+  displayName: string;
+  companyCode: string;
+  companyUuid: string;
   logoUrl?: string;
-  location: string;
+  // location: string; // Removed, as address has city/state/country
   subscribedServices: string[]; // Array of service names or IDs
   status: 'Active' | 'Inactive';
   lastUpdated: string; // ISO Date string
   contactInfo: {
     email: string;
     phone: string;
+    website?: string; // Added
   };
   address: {
     street: string;
@@ -21,6 +25,13 @@ export interface Company {
   billingInfo?: string;
   deliveryInfo?: string;
   notes?: string;
+  userOnboarding?: {
+    companyEmailDomains: string[];
+    excludedDomains: string[];
+    isExclusiveDomain: boolean;
+    autoAddUsers: boolean;
+  };
+  data_ai_hint?: string; // Keep for logo generation hint
 }
 
 export interface User {
@@ -62,4 +73,3 @@ export interface RecentActivity {
   type: 'CompanyUpdate' | 'UserUpdate' | 'ServiceSubscription' | 'System';
   icon?: React.ElementType;
 }
-

@@ -1,7 +1,7 @@
 
-"use client"; // Added "use client" for state and event handlers
+"use client"; 
 
-import React, { useState, useMemo } from 'react'; // Added useState and useMemo
+import React, { useState, useMemo } from 'react'; 
 import PageHeader from '@/components/shared/page-header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -28,13 +28,11 @@ import {
   PaginationNext,
   PaginationPrevious,
   PaginationEllipsis,
-} from "@/components/ui/pagination"; // Added pagination imports
+} from "@/components/ui/pagination"; 
 
-const ITEMS_PER_PAGE = 10; // Define items per page
+const ITEMS_PER_PAGE = 10; 
 
 export default function CompanyManagementPage() {
-  // const companies: Company[] = mockCompanies; // Original
-  // TODO: Implement actual search and filter logic from backend/database
   const [searchTerm, setSearchTerm] = useState('');
   const [serviceFilter, setServiceFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
@@ -42,8 +40,9 @@ export default function CompanyManagementPage() {
 
   const filteredCompanies = useMemo(() => {
     return mockCompanies.filter(company => {
-      const matchesSearch = company.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                            company.location.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesSearch = company.displayName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                            company.legalName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                            (company.address.city && company.address.city.toLowerCase().includes(searchTerm.toLowerCase()));
       const matchesService = serviceFilter ? company.subscribedServices.includes(serviceFilter) : true;
       const matchesStatus = statusFilter ? company.status === statusFilter : true;
       return matchesSearch && matchesService && matchesStatus;
@@ -76,7 +75,6 @@ export default function CompanyManagementPage() {
       }
 
       let startPage = Math.max(2, currentPage - halfMaxPages + (currentPage + halfMaxPages >= totalPages ? totalPages - (currentPage + halfMaxPages) -1 : 0) );
-      // Ensure startPage doesn't cause overlap with first page if ellipsis isn't needed
       if (startPage <= 2 && currentPage > halfMaxPages +1) startPage = currentPage - halfMaxPages +1;
 
 
@@ -93,7 +91,7 @@ export default function CompanyManagementPage() {
       }
       items.push(totalPages); 
     }
-    return items.filter((item, index, self) => { // Remove duplicates that might arise from edge cases
+    return items.filter((item, index, self) => { 
         if(typeof item === 'string' && typeof self[index-1] === 'string' && item.startsWith('ellipsis') && self[index-1]?.toString().startsWith('ellipsis')) return false;
         return self.indexOf(item) === index || typeof item === 'string';
     });
@@ -113,7 +111,7 @@ export default function CompanyManagementPage() {
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input 
             type="search" 
-            placeholder="Search companies..." 
+            placeholder="Search companies by name, city..." 
             className="pl-8 w-full" 
             value={searchTerm}
             onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
@@ -147,8 +145,8 @@ export default function CompanyManagementPage() {
           <TableHeader>
             <TableRow>
               <TableHead className="w-[80px]">Logo</TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>Location</TableHead>
+              <TableHead>Display Name</TableHead>
+              {/* <TableHead>Location</TableHead> // Removed as per request */}
               <TableHead>Subscribed Services</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Last Updated</TableHead>
@@ -161,7 +159,7 @@ export default function CompanyManagementPage() {
                 <TableCell>
                   <Image
                     src={company.logoUrl || `https://placehold.co/40x40.png`}
-                    alt={`${company.name} logo`}
+                    alt={`${company.displayName} logo`}
                     width={40}
                     height={40}
                     className="rounded-md object-cover"
@@ -170,10 +168,12 @@ export default function CompanyManagementPage() {
                 </TableCell>
                 <TableCell className="font-medium">
                   <Link href={`/companies/${company.id}`} className="hover:underline text-primary">
-                    {company.name}
+                    {company.displayName}
                   </Link>
+                  <p className="text-xs text-muted-foreground">{company.legalName}</p>
+                  <p className="text-xs text-muted-foreground">{company.address.city}{company.address.state ? `, ${company.address.state}` : ''}</p>
                 </TableCell>
-                <TableCell>{company.location}</TableCell>
+                {/* <TableCell>{company.address.city}, {company.address.state || company.address.country}</TableCell> // Removed */}
                 <TableCell>
                   <div className="flex flex-wrap gap-1">
                     {company.subscribedServices.slice(0, 2).map(service => (
@@ -213,7 +213,7 @@ export default function CompanyManagementPage() {
             ))}
              {paginatedCompanies.length === 0 && (
               <TableRow>
-                <TableCell colSpan={7} className="h-24 text-center">
+                <TableCell colSpan={6} className="h-24 text-center"> {/* Colspan updated */}
                   No companies found matching your criteria.
                 </TableCell>
               </TableRow>
