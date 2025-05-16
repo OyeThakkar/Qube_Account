@@ -102,7 +102,7 @@ export default function AddUserServiceDialog({ isOpen, onOpenChange, service, co
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] max-h-[90vh] flex flex-col">
+      <DialogContent className="sm:max-w-xl max-h-[90vh] flex flex-col"> {/* Changed sm:max-w-[500px] to sm:max-w-xl */}
         <DialogHeader>
           <DialogTitle>Add User to {service.name}</DialogTitle>
           <DialogDescription>
