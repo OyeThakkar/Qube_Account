@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { MoreVertical, Edit3, UserX, ServerCog, UserPlus } from "lucide-react";
+import { MoreVertical, Edit3, UserX, ServerCog, UserPlus as UserPlusIcon } from "lucide-react"; // Renamed UserPlus to UserPlusIcon
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import AddUserServiceDialog from './add-user-service-dialog';
 import { useToast } from "@/hooks/use-toast";
@@ -23,7 +23,7 @@ export default function CompanySubscriptionsTab({ companyId }: { companyId: stri
     return company.subscribedServices
       .map(serviceName => mockQubeServices.find(s => s.name === serviceName))
       .filter(service => service !== undefined) as QubeService[];
-  }, [company]);
+  }, [companyId, company]); // Added company to dependency array
 
   const [selectedService, setSelectedService] = useState<QubeService | null>(
     subscribedServices.length > 0 ? subscribedServices[0] : null
@@ -45,12 +45,15 @@ export default function CompanySubscriptionsTab({ companyId }: { companyId: stri
     }
   };
 
-  const handleUserAddedToService = (userId: string, serviceId: string, roles: string[]) => {
-    const user = mockCompanyUsers.find(u => u.id === userId);
+  const handleUserAddedToService = (identifier: string, serviceId: string, roles: string[]) => {
+    const existingUser = mockCompanyUsers.find(u => u.id === identifier || u.email.toLowerCase() === identifier.toLowerCase());
     const service = mockQubeServices.find(s => s.id === serviceId);
-    console.log(`User ${user?.name} (ID: ${userId}) added to service ${service?.name} (ID: ${serviceId}) for company ${companyId} with roles: ${roles.join(', ')}`);
+    
+    const userName = existingUser ? existingUser.name : identifier; // Use email if it's a new user identifier
+
+    console.log(`User ${userName} (ID/Email: ${identifier}) added/to be added to service ${service?.name} (ID: ${serviceId}) for company ${companyId} with roles: ${roles.join(', ')}`);
     // In a real app, you would update your backend and then refresh or optimistically update 'serviceUsers'
-    // For now, we just log and show a toast. The list won't visually update.
+    // For now, we just log. The dialog itself will show a success toast.
   };
 
 
@@ -96,7 +99,7 @@ export default function CompanySubscriptionsTab({ companyId }: { companyId: stri
             <>
               <div className="mb-4 text-right">
                 <Button size="sm" onClick={handleOpenAddUserDialog}>
-                  <UserPlus className="mr-2 h-4 w-4" /> Add User to Service
+                  <UserPlusIcon className="mr-2 h-4 w-4" /> Add User to Service
                 </Button>
               </div>
               <div className="rounded-lg border overflow-hidden shadow-sm">
@@ -173,3 +176,4 @@ export default function CompanySubscriptionsTab({ companyId }: { companyId: stri
     </div>
   );
 }
+
