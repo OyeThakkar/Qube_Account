@@ -38,8 +38,10 @@ export default function ServicesPage() {
                 <TableCell className="text-center">{service.subscribedCompaniesCount}</TableCell>
                 <TableCell>{format(new Date(service.lastUpdated), 'PP')}</TableCell>
                 <TableCell className="text-right">
-                  <Button variant="outline" size="sm" disabled> {/* Disabled as per read-only nature specified */}
-                    <Settings2 className="mr-2 h-4 w-4" /> Configure
+                  <Button variant="outline" size="sm" asChild>
+                    <Link href={`/services/${service.id}/configure`}>
+                      <Settings2 className="mr-2 h-4 w-4" /> Configure
+                    </Link>
                   </Button>
                 </TableCell>
               </TableRow>
@@ -55,8 +57,9 @@ export default function ServicesPage() {
         </Table>
       </div>
       <p className="mt-4 text-sm text-muted-foreground">
-        Note: Service configuration and integration settings are managed by system administrators. This page is for informational purposes.
+        Note: Service configuration involves managing service-specific settings and roles.
       </p>
     </>
   );
 }
+

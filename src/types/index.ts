@@ -51,12 +51,26 @@ export interface PortalUser {
   lastUpdatedBy: string; // User name or ID
 }
 
+export interface ServiceRole {
+  id: string;
+  name: string;
+  description: string;
+  status: 'Active' | 'Inactive';
+  updatedOn: string; // ISO Date string
+  updatedBy: string; // User name or ID
+}
+
 export interface QubeService {
   id: string;
   name: string;
   accessUrl: string;
   subscribedCompaniesCount: number;
   lastUpdated: string; // ISO Date string
+  description?: string;
+  uuid?: string;
+  clientId?: string;
+  token?: string; // This should be handled securely in a real app
+  roles?: ServiceRole[];
 }
 
 export interface DashboardMetrics {
@@ -73,3 +87,4 @@ export interface RecentActivity {
   type: 'CompanyUpdate' | 'UserUpdate' | 'ServiceSubscription' | 'System';
   icon?: React.ElementType;
 }
+
