@@ -95,13 +95,13 @@ const qubeWireExhibitorRoles = [
 
 export let mockQubeServices: QubeService[] = [
   { 
-    id: 'qs1', name: 'Qube Wire Distributor', accessUrl: 'distributor.qubewire.com', subscribedCompaniesCount: 25, lastUpdated: new Date().toISOString(),
+    id: 'qs1', name: 'Qube Wire Distributor', accessUrl: 'distributors.qubewire.com', subscribedCompaniesCount: 25, lastUpdated: new Date().toISOString(),
     description: 'Manages distribution of digital cinema packages to exhibitors worldwide. Features content uploading, KDM generation, and delivery tracking.',
     uuid: 'uuid-qwd-001', clientId: 'qwd-app-client', token: 'placeholder-token-qwd',
     roles: generateServiceRoles('qs1', qubeWireDistributorRoles),
   },
   { 
-    id: 'qs2', name: 'Qube Wire Exhibitor', accessUrl: 'exhibitor.qubewire.com', subscribedCompaniesCount: 150, lastUpdated: new Date().toISOString(),
+    id: 'qs2', name: 'Qube Wire Exhibitor', accessUrl: 'cinemas.qubewire.com', subscribedCompaniesCount: 150, lastUpdated: new Date().toISOString(),
     description: 'Platform for exhibitors to receive and manage digital cinema packages, KDMs, and screen content.',
     uuid: 'uuid-qwe-002', clientId: 'qwe-app-client', token: 'placeholder-token-qwe',
     roles: generateServiceRoles('qs2', qubeWireExhibitorRoles),
