@@ -56,11 +56,16 @@ const ServiceTable: React.FC<{ services: QubeService[] }> = ({ services }) => {
 };
 
 export default function ServicesPage() {
-  const allServices: QubeService[] = mockQubeServices; // Already sorted alphabetically
+  const allMockServices: QubeService[] = mockQubeServices; 
   const internalServiceNames = ["CinemasDB", "Qube Account", "Qube Wire Admin"];
-  const internalServices: QubeService[] = allServices.filter(service =>
-    internalServiceNames.includes(service.name)
-  ).sort((a, b) => a.name.localeCompare(b.name)); // Ensure internal services are also sorted
+  
+  const allCompanyServices: QubeService[] = allMockServices
+    .filter(service => !internalServiceNames.includes(service.name))
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  const internalServices: QubeService[] = allMockServices
+    .filter(service => internalServiceNames.includes(service.name))
+    .sort((a, b) => a.name.localeCompare(b.name));
 
   return (
     <>
@@ -73,7 +78,7 @@ export default function ServicesPage() {
         </TabsList>
 
         <TabsContent value="all-services">
-          <ServiceTable services={allServices} />
+          <ServiceTable services={allCompanyServices} />
           <p className="mt-4 text-sm text-muted-foreground">
             This list includes all services available for company subscriptions. Service configuration involves managing service-specific settings and roles.
           </p>
