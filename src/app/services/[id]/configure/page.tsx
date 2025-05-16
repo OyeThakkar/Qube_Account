@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { mockQubeServices } from '@/lib/mock-data';
 import type { QubeService, ServiceRole } from '@/types';
 import Link from 'next/link';
-import { ArrowLeft, FileText, UsersCog } from 'lucide-react';
+import { ArrowLeft, FileText, UserCog } from 'lucide-react'; // Corrected from UsersCog to UserCog
 import { notFound } from 'next/navigation';
 import { format } from 'date-fns';
 
@@ -16,7 +16,7 @@ interface ConfigureServicePageProps {
   params: { id: string };
 }
 
-const DetailItem: React.FC<{ label: string; value?: string | number }> = ({ label, value }) => (
+const DetailItem: React.FC<{ label: string; value?: string | number | null }> = ({ label, value }) => (
   <div className="grid grid-cols-3 gap-2 py-2 border-b last:border-b-0">
     <dt className="font-medium text-muted-foreground">{label}</dt>
     <dd className="col-span-2">{value || <span className="italic text-muted-foreground">Not set</span>}</dd>
@@ -48,7 +48,7 @@ export default function ConfigureServicePage({ params }: ConfigureServicePagePro
       <Tabs defaultValue="details" className="w-full">
         <TabsList className="grid w-full grid-cols-1 sm:grid-cols-2 mb-6">
           <TabsTrigger value="details"><FileText className="mr-2 h-4 w-4 sm:hidden md:inline-block" />Service Details</TabsTrigger>
-          <TabsTrigger value="roles"><UsersCog className="mr-2 h-4 w-4 sm:hidden md:inline-block" />Service Roles</TabsTrigger>
+          <TabsTrigger value="roles"><UserCog className="mr-2 h-4 w-4 sm:hidden md:inline-block" />Service Roles</TabsTrigger>
         </TabsList>
         
         <TabsContent value="details">
