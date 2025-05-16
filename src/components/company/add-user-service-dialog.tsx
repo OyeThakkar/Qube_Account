@@ -11,7 +11,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { mockCompanyUsers } from '@/lib/mock-data';
 import type { QubeService, User, ServiceRole } from '@/types';
 import { useToast } from '@/hooks/use-toast';
-import { AlertCircle, UserPlus } from "lucide-react"; // Added UserPlus
+import { AlertCircle, UserPlus } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { format } from 'date-fns';
 
@@ -43,11 +43,10 @@ export default function AddUserServiceDialog({ isOpen, onOpenChange, service, co
     const newEmail = e.target.value;
     setEmail(newEmail);
     setFoundUser(null); 
-    // setSelectedRoleIds([]); // Optionally reset roles, or keep them if user is just correcting email
     setSearchAttempted(false);
 
     if (newEmail.length > 5 && newEmail.includes('@') && newEmail.includes('.')) { // Basic validation
-      const user = mockCompanyUsers.find(u => u.email.toLowerCase() === newEmail.toLowerCase());
+      const user = mockCompanyUsers.find(u => u.email.toLowerCase() === newEmail.toLowerCase() && u.status === 'Active'); // Also check if user is active for the company
       if (user) {
         setFoundUser(user);
       } else {
@@ -64,14 +63,16 @@ export default function AddUserServiceDialog({ isOpen, onOpenChange, service, co
   };
 
   const isValidEmail = (emailStr: string) => {
-    return emailStr.length > 5 && emailStr.includes('@') && emailStr.includes('.');
+    // A more robust email validation regex could be used here
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(emailStr);
   }
 
   const handleSubmit = () => {
-    if (!service || selectedRoleIds.length === 0 || !isValidEmail(email)) {
+    if (!service || selectedRoleIds.length === 0 || (!foundUser && !isValidEmail(email))) {
       toast({
         title: "Missing Information",
-        description: "Please ensure a valid email is entered and at least one role is selected.",
+        description: "Please ensure a valid email is entered (if new user) and at least one role is selected.",
         variant: "destructive",
       });
       return;
@@ -80,17 +81,29 @@ export default function AddUserServiceDialog({ isOpen, onOpenChange, service, co
     const selectedRoleNames = service.roles?.filter(r => selectedRoleIds.includes(r.id)).map(r => r.name) || [];
     
     if (foundUser) {
+      // Check if user is already associated with this service for this company (mock scenario)
+      // This would be a backend check in a real app
+      const isAlreadyAssociated = foundUser.associatedServices.includes(service.name);
+      if(isAlreadyAssociated && (Math.random() > 0.7)) { // Simulate sometimes user is already there
+         toast({
+          title: "User Already Has Access",
+          description: `${foundUser.name} already has access to ${service.name}. You can modify their roles if needed. (Mock info)`,
+          variant: "default", 
+        });
+        onOpenChange(false);
+        return;
+      }
+
       onUserAddedToService(foundUser.id, service.id, selectedRoleNames);
       toast({
         title: "User Access Granted",
         description: `${foundUser.name} has been given access to ${service.name} with roles: ${selectedRoleNames.join(', ')}.`,
       });
-    } else { // New user flow
-      // In a real app, this would trigger user creation API for the company
-      onUserAddedToService(email, service.id, selectedRoleNames); // Pass email as identifier
+    } else { 
+      onUserAddedToService(email, service.id, selectedRoleNames);
       toast({
         title: "New User Registration Initiated",
-        description: `User with email ${email} will be created for this company and granted access to ${service.name} with roles: ${selectedRoleNames.join(', ')}. (Mock behavior)`,
+        description: `User with email ${email} will be created for company ${companyId} and granted access to ${service.name} with roles: ${selectedRoleNames.join(', ')}. (Mock behavior)`,
       });
     }
     onOpenChange(false); 
@@ -98,11 +111,11 @@ export default function AddUserServiceDialog({ isOpen, onOpenChange, service, co
 
   if (!service) return null;
 
-  const memberSinceDate = foundUser ? format(new Date(Date.now() - Math.floor(Math.random() * 365) * 24 * 60 * 60 * 1000), 'PP') : 'N/A';
+  const memberSinceDate = foundUser ? format(new Date(Date.now() - Math.floor(Math.random() * 365 * 30) * 24 * 60 * 60 * 1000), 'PP') : 'N/A';
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-xl max-h-[90vh] flex flex-col"> {/* Changed sm:max-w-[500px] to sm:max-w-xl */}
+      <DialogContent className="sm:max-w-xl max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>Add User to {service.name}</DialogTitle>
           <DialogDescription>
@@ -110,8 +123,8 @@ export default function AddUserServiceDialog({ isOpen, onOpenChange, service, co
           </DialogDescription>
         </DialogHeader>
         
-        <div className="grid gap-4 py-4 flex-grow overflow-hidden">
-          <div className="grid grid-cols-4 items-center gap-4">
+        <div className="grid gap-4 py-4 flex-grow overflow-y-auto">
+          <div className="grid grid-cols-4 items-center gap-4 px-1">
             <Label htmlFor="email-add-user" className="text-right">
               Email ID
             </Label>
@@ -126,7 +139,7 @@ export default function AddUserServiceDialog({ isOpen, onOpenChange, service, co
           </div>
 
           {searchAttempted && !foundUser && isValidEmail(email) && (
-             <Alert variant="default" className="col-span-4"> 
+             <Alert variant="default" className="mx-1"> 
                 <UserPlus className="h-4 w-4" />
                 <AlertTitle>New User Registration</AlertTitle>
                 <AlertDescription>
@@ -137,7 +150,7 @@ export default function AddUserServiceDialog({ isOpen, onOpenChange, service, co
           )}
           
           {searchAttempted && !foundUser && !isValidEmail(email) && email.length > 0 && (
-             <Alert variant="destructive" className="col-span-4">
+             <Alert variant="destructive" className="mx-1">
                 <AlertCircle className="h-4 w-4" />
                 <AlertTitle>Invalid Email</AlertTitle>
                 <AlertDescription>Please enter a valid email address.</AlertDescription>
@@ -146,34 +159,34 @@ export default function AddUserServiceDialog({ isOpen, onOpenChange, service, co
 
 
           {foundUser && (
-            <div className="space-y-2 mt-2 border-t pt-4">
+            <div className="space-y-2 mt-2 border-t pt-4 px-1">
               <div className="grid grid-cols-4 items-center gap-x-4 gap-y-1">
                 <Label className="text-right col-span-1 font-semibold">Name:</Label>
                 <p className="col-span-3">{foundUser.name}</p>
                 <Label className="text-right col-span-1 font-semibold">Status:</Label>
                 <p className="col-span-3">{foundUser.status}</p>
                 <Label className="text-right col-span-1 font-semibold">Member Since:</Label>
-                <p className="col-span-3 text-sm">{memberSinceDate} (Placeholder)</p>
+                <p className="col-span-3 text-sm">{memberSinceDate} (Mock Data)</p>
               </div>
             </div>
           )}
 
-          {/* Roles selection - always visible if service exists and email is potentially valid */}
           {(isValidEmail(email) || foundUser) && (
-            <div className="mt-4 border-t pt-4">
+            <div className="mt-4 border-t pt-4 px-1">
               <Label className="font-semibold block mb-2">Assign Roles for {service.name}:</Label>
               <ScrollArea className="h-[200px] w-full rounded-md border p-3">
                 <div className="space-y-2">
                   {service.roles && service.roles.length > 0 ? service.roles.map((role: ServiceRole) => (
-                    <div key={role.id} className="flex items-center space-x-3 p-2 hover:bg-muted/50 rounded-md">
+                    <div key={role.id} className="flex items-start space-x-3 p-2 hover:bg-muted/50 rounded-md">
                       <Checkbox
                         id={`role-${role.id}`}
                         checked={selectedRoleIds.includes(role.id)}
                         onCheckedChange={() => handleRoleToggle(role.id)}
+                        className="mt-1" 
                       />
                       <Label htmlFor={`role-${role.id}`} className="font-normal cursor-pointer flex-1">
                         <span className="font-medium">{role.name}</span>
-                        <p className="text-xs text-muted-foreground">{role.description}</p>
+                        <p className="text-xs text-muted-foreground break-words">{role.description}</p>
                       </Label>
                     </div>
                   )) : (
@@ -185,11 +198,11 @@ export default function AddUserServiceDialog({ isOpen, onOpenChange, service, co
             </div>
           )}
         </div>
-        <DialogFooter className="mt-auto pt-4 border-t">
+        <DialogFooter className="mt-auto pt-4 border-t"> 
           <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
           <Button 
             onClick={handleSubmit} 
-            disabled={!isValidEmail(email) || selectedRoleIds.length === 0}
+            disabled={selectedRoleIds.length === 0 || (!foundUser && !isValidEmail(email))}
           >
             {foundUser ? 'Add User to Service' : 'Create User & Add to Service'}
           </Button>
@@ -199,3 +212,4 @@ export default function AddUserServiceDialog({ isOpen, onOpenChange, service, co
   );
 }
 
+    
