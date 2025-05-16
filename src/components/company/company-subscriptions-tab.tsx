@@ -11,13 +11,15 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { MoreVertical, Edit3, UserX, ServerCog, UserPlus } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import AddUserServiceDialog from './add-user-service-dialog';
+import { useToast } from "@/hooks/use-toast";
 
 export default function CompanySubscriptionsTab({ companyId }: { companyId: string }) {
   const company = mockCompanies.find(c => c.id === companyId);
+  const { toast } = useToast();
 
   const subscribedServices = useMemo(() => {
     if (!company) return [];
-    // Map service names from company.subscribedServices to full QubeService objects
     return company.subscribedServices
       .map(serviceName => mockQubeServices.find(s => s.name === serviceName))
       .filter(service => service !== undefined) as QubeService[];
@@ -27,19 +29,36 @@ export default function CompanySubscriptionsTab({ companyId }: { companyId: stri
     subscribedServices.length > 0 ? subscribedServices[0] : null
   );
 
+  const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false);
+
   // Mocked: users associated with the selected service for this company
+  // TODO: This mock logic needs to be more robust if we want to see users added via the dialog
   const serviceUsers = selectedService
-    ? mockCompanyUsers.filter(u => Math.random() > 0.3).map(u => ({ ...u, serviceRole: ['Admin', 'Editor', 'Viewer'][Math.floor(Math.random() * 3)] }))
+    ? mockCompanyUsers.filter(u => Math.random() > 0.3 && u.associatedServices.includes(selectedService.name)).map(u => ({ ...u, serviceRole: selectedService.roles?.[Math.floor(Math.random() * (selectedService.roles?.length || 1))]?.name || 'User' }))
     : [];
 
-  // const handleManageUserAccess = (userId: string, serviceId: string) => { console.log("Manage user", userId, "access for service", serviceId); };
+  const handleOpenAddUserDialog = () => {
+    if (selectedService) {
+      setIsAddUserDialogOpen(true);
+    } else {
+       toast({ title: "No Service Selected", description: "Please select a service from the list first.", variant: "destructive" });
+    }
+  };
+
+  const handleUserAddedToService = (userId: string, serviceId: string, roles: string[]) => {
+    const user = mockCompanyUsers.find(u => u.id === userId);
+    const service = mockQubeServices.find(s => s.id === serviceId);
+    console.log(`User ${user?.name} (ID: ${userId}) added to service ${service?.name} (ID: ${serviceId}) for company ${companyId} with roles: ${roles.join(', ')}`);
+    // In a real app, you would update your backend and then refresh or optimistically update 'serviceUsers'
+    // For now, we just log and show a toast. The list won't visually update.
+  };
+
 
   return (
     <div className="grid md:grid-cols-3 gap-6">
       <Card className="md:col-span-1">
         <CardHeader>
           <CardTitle className="text-lg">Subscribed Services</CardTitle>
-          {/* Removed "Add Service" button as subscriptions are managed in CompanyForm */}
         </CardHeader>
         <CardContent>
           <ScrollArea className="h-[400px]">
@@ -76,7 +95,7 @@ export default function CompanySubscriptionsTab({ companyId }: { companyId: stri
           {selectedService ? (
             <>
               <div className="mb-4 text-right">
-                <Button size="sm" >{/*onClick={() => console.log("Add user to service", selectedService.id)}*/}
+                <Button size="sm" onClick={handleOpenAddUserDialog}>
                   <UserPlus className="mr-2 h-4 w-4" /> Add User to Service
                 </Button>
               </div>
@@ -142,6 +161,15 @@ export default function CompanySubscriptionsTab({ companyId }: { companyId: stri
           )}
         </CardContent>
       </Card>
+      {selectedService && (
+        <AddUserServiceDialog
+            isOpen={isAddUserDialogOpen}
+            onOpenChange={setIsAddUserDialogOpen}
+            service={selectedService}
+            companyId={companyId}
+            onUserAddedToService={handleUserAddedToService}
+        />
+      )}
     </div>
   );
 }
