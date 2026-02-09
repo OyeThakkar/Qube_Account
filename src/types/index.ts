@@ -88,3 +88,72 @@ export interface RecentActivity {
   icon?: React.ElementType;
 }
 
+// Ad Pod Compiler Types
+export type Rating = 'G' | 'PG' | 'PG-13' | 'R';
+export type Section = 'LPS' | 'EPS';
+export type Aspect = 'Flat' | 'Scope';
+
+export interface CPLAsset {
+  uuid: string;
+  path?: string;
+  hash?: string;
+}
+
+export interface CPLReel {
+  id: string;
+  uuid: string;
+  assets: CPLAsset[];
+  duration?: string;
+  editRate?: string;
+}
+
+export interface CPLMetadata {
+  uuid: string;
+  contentTitle: string;
+  editRate: string;
+  aspect: Aspect;
+  audioChannels?: number;
+  encrypted: boolean;
+  reels: CPLReel[];
+  issueDate?: string;
+  creator?: string;
+}
+
+export interface UploadedCPL {
+  id: string;
+  fileName: string;
+  metadata: CPLMetadata;
+  order: number;
+  validated: boolean;
+  validationErrors: string[];
+}
+
+export interface PodConfiguration {
+  theatreName: string;
+  theatreId: string;
+  rating: Rating;
+  section: Section;
+  aspect: Aspect;
+  startDate: string; // dd-mmm-yyyy format
+  cpls: UploadedCPL[];
+}
+
+export interface AdPod {
+  id: string;
+  podName: string;
+  configuration: PodConfiguration;
+  status: 'draft' | 'validated' | 'generated' | 'failed';
+  generatedCPL?: CPLMetadata;
+  createdAt: string;
+  generatedAt?: string;
+  errorMessage?: string;
+}
+
+export interface DCPPackage {
+  podName: string;
+  assetMap: string; // XML content
+  pkl: string; // XML content
+  cpl: string; // XML content
+  mxfReferences: string[]; // List of MXF file paths
+}
+

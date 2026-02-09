@@ -20,6 +20,7 @@ import {
   Power,
   Moon,
   Sun,
+  Film,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTheme } from 'next-themes'; // Assuming next-themes is or will be installed for theme toggling
@@ -30,6 +31,7 @@ const navItems = [
   { href: '/companies', label: 'Company Management', icon: Building2 },
   { href: '/portal-users', label: 'Portal Users', icon: Users },
   { href: '/services', label: 'Services', icon: ServiceIcon },
+  { href: '/ad-pods', label: 'Ad Pod Compiler', icon: Film },
   { href: '/settings', label: 'Settings', icon: Settings },
 ];
 
