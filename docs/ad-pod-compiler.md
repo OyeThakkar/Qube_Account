@@ -123,6 +123,32 @@ T1042_PG13_LPS_FLAT_06-Feb-2026
 - **`src/lib/ad-pod-utils.ts`** - Core utilities for CPL parsing, validation, and generation
 - **`src/types/index.ts`** - TypeScript type definitions
 
+### Implementation Notes
+
+#### CPL Parsing
+The current implementation uses regex-based XML parsing for simplicity. For production use, consider:
+- Implementing a proper XML parser (e.g., fast-xml-parser, xml2js)
+- Adding comprehensive error handling
+- Supporting more CPL variants and edge cases
+
+#### DCP Package Generation
+The generated DCP packages include placeholder values for:
+- **File Sizes** - Set to 0 in ASSETMAP and PKL
+- **SHA-1 Hashes** - Set to placeholder in PKL
+- **File Offsets** - Set to 0 in ASSETMAP
+
+For production deployment, these should be computed from actual MXF files:
+```typescript
+// Example: Compute actual file hash
+const actualHash = await computeSHA1Hash(mxfFilePath);
+
+// Example: Get actual file size
+const actualSize = await getFileSize(mxfFilePath);
+```
+
+#### Browser Limitations
+All cryptographic operations use browser-compatible implementations. The hash generation for pod IDs uses a simple string-based hash function suitable for deterministic naming but not cryptographic security.
+
 ### Key Functions
 
 #### CPL Parsing
@@ -197,6 +223,28 @@ For 1,500 theatres:
 6. **Analytics Dashboard** - Pod delivery and playback statistics
 7. **Version Control** - Track pod revisions and changes
 8. **API Integration** - RESTful API for programmatic access
+
+## Known Limitations
+
+### Current Implementation
+
+1. **XML Parsing** - Uses regex-based parsing instead of a full XML parser. May not handle all CPL variants.
+2. **Placeholder Values** - Generated DCP packages use placeholder values for file sizes and SHA-1 hashes. These must be computed from actual MXF files for production use.
+3. **No File Validation** - Does not verify that referenced MXF files actually exist in the asset repository.
+4. **Memory Constraints** - Large CPL files (>10MB) may cause performance issues in the browser.
+5. **No Batch Operations** - Must create pods one at a time.
+6. **Client-Side Only** - All processing happens in the browser; no server-side validation or storage.
+
+### Production Considerations
+
+For production deployment, implement:
+- Server-side CPL processing with proper XML parser
+- Actual SHA-1 hash computation from MXF files
+- File size determination from asset repository
+- Asset existence verification
+- Database storage for pod configurations
+- Background job processing for large batches
+- Integration with content delivery network (CDN)
 
 ## Troubleshooting
 

@@ -1,8 +1,11 @@
 import { CPLMetadata, UploadedCPL, PodConfiguration, DCPPackage, Aspect, CPLReel, CPLAsset } from '@/types';
-import { createHash } from 'crypto';
 
 /**
  * Parse CPL XML content and extract metadata
+ * 
+ * Note: This is a simplified parser using regex patterns. In a production system,
+ * consider using a proper XML parser library (e.g., fast-xml-parser, xml2js) for
+ * robust XML parsing and to avoid ReDoS vulnerabilities.
  */
 export function parseCPLXML(xmlContent: string, fileName: string): CPLMetadata {
   // Note: In a real implementation, this would use a proper XML parser
@@ -130,7 +133,7 @@ export function validateCPLCompatibility(cpls: UploadedCPL[]): { valid: boolean;
  */
 export function generatePodId(config: PodConfiguration): string {
   // Format: THEATERID_RATING_SECTION_ASPECT_dd-mmm-yyyy
-  const ratingFormatted = config.rating.replace('-', '');
+  const ratingFormatted = config.rating.replaceAll('-', '');
   const podName = `${config.theatreId}_${ratingFormatted}_${config.section}_${config.aspect.toUpperCase()}_${config.startDate}`;
   
   return podName;
@@ -203,6 +206,9 @@ export function stitchCPLs(cpls: UploadedCPL[], config: PodConfiguration): CPLMe
 
 /**
  * Generate ASSETMAP.xml content
+ * 
+ * Note: This function generates ASSETMAP with placeholder values for Length and Offset.
+ * In a production system, actual file sizes should be computed from the MXF files.
  */
 export function generateAssetMap(cpl: CPLMetadata, mxfReferences: string[]): string {
   const assetMapXML = `<?xml version="1.0" encoding="UTF-8"?>
@@ -255,6 +261,10 @@ ${mxfReferences.map(mxf => `    <Asset>
 
 /**
  * Generate PKL.xml content
+ * 
+ * Note: This function generates PKL with placeholder values for Size and Hash.
+ * In a production system, actual SHA-1 hashes and file sizes should be computed 
+ * from the actual MXF files and CPL for proper DCP validation.
  */
 export function generatePKL(cpl: CPLMetadata, mxfReferences: string[]): string {
   const pklXML = `<?xml version="1.0" encoding="UTF-8"?>
